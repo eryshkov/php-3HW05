@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class MailerTests extends TestCase
 {
+    /** @link https://blogs.msdn.microsoft.com/testing123/2009/02/06/email-address-test-cases/  */
     protected $emailListValid = <<<'VALID'
 email@example.com
 firstname.lastname@example.com
