@@ -126,7 +126,10 @@ class User
 
         return $this;
     }
-    
+    /**
+     * @template "$firstName $lastName"
+     *
+     */
     public function getFullName(): string
     {
         $firstName = trim($this->firstName);
