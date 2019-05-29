@@ -29,4 +29,25 @@ class Mailer
         
         return $mailer->send($message);
     }
+    
+    /**
+     * @param string $email
+     * @return bool|null
+     */
+    protected function validateEmail(string $email): ?bool
+    {
+        $regExp = '~[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}~i';
+    
+        $result = preg_match($regExp, $email);
+    
+        if (1 === $result) {
+            return true;
+        }
+        
+        if (0 === $result) {
+            return false;
+        }
+        
+        return null;
+    }
 }
