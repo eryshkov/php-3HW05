@@ -136,6 +136,7 @@ class User
         $middleName = trim($this->middleName);
         $lastName = trim($this->lastName);
     
+        //-------Start of search names at @template-------//
         $reflector = new \ReflectionMethod(self::class, 'getFullName');
         $docComment = $reflector->getDocComment();
         
@@ -156,6 +157,7 @@ class User
                 }
             }
         }
+        //-------End of search names at @template-------//
     
         if (!empty($firstName) && !empty($lastName)) {
             if (empty($middleName)) {
