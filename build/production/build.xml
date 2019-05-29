@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="php-3HW01" default="cronTaskAdd" basedir=".">
+    <tstamp>
+        <format property="date_time" pattern="%Y-%m-%d-%H-%M-%S" timezone="Europe/Moscow"/>
+    </tstamp>
+    <property name="app.destination.tmp.path" value="${app.destination.path}/${date_time}"/>
+    <property name="app.destination.current.path" value="${app.destination.path}/current"/>
+
+    <target name="prepare">
+        <echo msg="I'm Phing"/>
+        <echo msg="My base dirrectory: ${project.basedir}"/>
+        <echo msg="Received destination directory: ${app.destination.path}"/>
+        <echo msg="Received destination temporary directory: ${app.destination.tmp.path}"/>
+        <echo msg="Received domain: ${app.domain}"/>
+    </target>
+
+    <target name="copyFiles" depends="prepare">
+        <mkdir dir="${app.destination.path}"/>
+        <mkdir dir="${app.destination.tmp.path}"/>
+        <copy todir="${app.destination.tmp.path}">
+            <fileset dir="${project.basedir}">
+                <include name="**"/>
+                <exclude name="config/packages/myConfig.yaml"/>
+                <exclude name="build/production/.env.local"/>
+                <exclude name="screens/**"/>
+                <exclude name="build/**"/>
+                <exclude name="var/**"/>
+                <exclude name="vendor/**"/>
+                <exclude name=".editorconfig"/>
+                <exclude name="phing.phar"/>
+                <exclude name="*.md"/>
+            </fileset>
+        </copy>
+        <copy todir="${app.destination.tmp.path}"
+              file="${project.basedir}/build/production/cron.txt"
+              overwrite="true">
+        </copy>
+        <copy todir="${app.destination.tmp.path}/config/packages"
+              file="${project.basedir}/build/production/myConfig.yaml"
+              overwrite="true">
+            <filterchain>
+                <replacetokens begintoken="{{" endtoken="}}">
+                    <token key="domain" value="${app.domain}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+
+        <copy todir="${app.destination.tmp.path}"
+              file="${project.basedir}/build/production/.env.local"
+              overwrite="true">
+            <filterchain>
+                <replacetokens begintoken="{{" endtoken="}}">
+                    <token key="db_driver" value="${app.db_driver}"/>
+                    <token key="db_user" value="${app.db_user}"/>
+                    <token key="db_password" value="${app.db_password}"/>
+                    <token key="db_host" value="${app.db_host}"/>
+                    <token key="db_port" value="${app.db_port}"/>
+                    <token key="db_name" value="${app.db_name}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+    </target>
+
+    <target name="symlink" depends="copyFiles">
+        <exec dir="${app.destination.path}" executable="rm">
+            <arg line="-f"/>
+            <arg line="-v"/>
+            <arg path="${app.destination.current.path}"/>
+        </exec>
+
+        <exec dir="${app.destination.path}" executable="ln" passthru="true">
+            <arg line="-s"/>
+            <arg line="-v"/>
+            <arg path="${app.destination.tmp.path}"/>
+            <arg path="${app.destination.current.path}"/>
+        </exec>
+    </target>
+
+    <target name="composer" depends="symlink">
+        <exec dir="${app.destination.current.path}" executable="composer" passthru="true">
+            <arg line="install"/>
+        </exec>
+    </target>
+
+    <target name="makeMigrations" depends="composer">
+        <exec dir="${app.destination.current.path}/bin" executable="php" passthru="true">
+            <arg line="console"/>
+            <arg line="doctrine:migrations:migrate"/>
+            <arg line="--no-interaction"/>
+            <arg line="-vv"/>
+        </exec>
+    </target>
+
+    <target name="loadFixtures" depends="makeMigrations">
+        <exec dir="${app.destination.current.path}/bin" executable="php" passthru="true">
+            <arg line="console"/>
+            <arg line="doctrine:fixtures:load"/>
+            <arg line="--no-interaction"/>
+            <arg line="-vv"/>
+        </exec>
+    </target>
+
+    <target name="userTests" depends="loadFixtures">
+        <exec dir="${app.destination.current.path}/vendor/bin" executable="php" passthru="true">
+            <arg line="phpunit"/>
+            <arg line="${app.destination.current.path}/tests"/>
+            <arg line="--verbose"/>
+        </exec>
+    </target>
+
+    <target name="cronTaskAdd" depends="userTests">
+        <exec dir="${app.destination.current.path}" executable="crontab" passthru="true">
+            <arg line="cron.txt"/>
+        </exec>
+    </target>
+
+</project>

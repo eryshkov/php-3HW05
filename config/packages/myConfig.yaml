@@ -1,0 +1,2 @@
+parameters:
+      app.site_name: 'test.com'
