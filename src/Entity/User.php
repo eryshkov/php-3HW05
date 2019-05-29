@@ -151,10 +151,8 @@ class User
         foreach ($matches as $pieceArray) {
             /** @var string $piece */
             $piece = str_replace('$', '', reset($pieceArray));
-            if (!empty($piece)) {
-                if (!empty($$piece)) {
-                    $validPieces[] = $$piece;
-                }
+            if (!empty($piece) && !empty($$piece)) {
+                $validPieces[] = $$piece;
             }
         }
         //-------End of search names at @template-------//
