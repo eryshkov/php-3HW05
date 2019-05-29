@@ -57,6 +57,12 @@ INVALID;
             $isValid = $reflector->invoke($mailer, $validEmail);
             $this->assertTrue($isValid, $validEmail . ' is not valid');
         }
+    
+        $invalidEmails = explode(PHP_EOL, $this->emailListInvalid);
+        foreach ($invalidEmails as $invalidEmail) {
+            $isValid = $reflector->invoke($mailer, $invalidEmail);
+            $this->assertFalse($isValid, $invalidEmail . ' is valid');
+        }
     }
 }
 

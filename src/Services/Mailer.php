@@ -36,7 +36,7 @@ class Mailer
      */
     protected function validateEmail(string $email): ?bool
     {
-        $regExp = '~"?[A-Z0-9._%+-]+"?@\[?[A-Z0-9.-]+\.[A-Z0-9]{2,}\]?~i';
+        $regExp = '~^[^.]"?[A-Z0-9._%+-]+"?[^.]@\[?[A-Z0-9.-]+\.[A-Z0-9]{2,}\]?$~iD';
     
         $result = preg_match($regExp, $email);
     
