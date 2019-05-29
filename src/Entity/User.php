@@ -135,19 +135,33 @@ class User
         $firstName = trim($this->firstName);
         $middleName = trim($this->middleName);
         $lastName = trim($this->lastName);
+    
+        $reflector = new \ReflectionMethod(self::class, 'getFullName');
+        $docComment = $reflector->getDocComment();
         
+        $regExp = '~@template.+"(\$[0-9A-Z]+)* *(\$[0-9A-Z]+)* *(\$[0-9A-Z]+)*"~mi';
+        preg_match_all($regExp, $docComment, $matches, PREG_PATTERN_ORDER);
+    
+        if (null === array_shift($matches)) {
+            throw new \LogicException('No matches found');
+        }
+    
+        $validPieces = [];
+        foreach ($matches as $pieceArray) {
+            /** @var string $piece */
+            $piece = str_replace('$', '', reset($pieceArray));
+            if (!empty($piece)) {
+                if (!empty($$piece)) {
+                    $validPieces[] = $$piece;
+                }
+            }
+        }
+    
         if (!empty($firstName) && !empty($lastName)) {
             if (empty($middleName)) {
-                return implode(' ', [
-                    $firstName,
-                    $lastName
-                ]);
+                return implode(' ', $validPieces);
             } else {
-                return implode(' ', [
-                    $firstName,
-                    $middleName,
-                    $lastName
-                ]);
+                return implode(' ', $validPieces);
             }
         }
     
