@@ -4,6 +4,7 @@ namespace App\Tests;
 
 use App\Services\Mailer;
 use PHPUnit\Framework\TestCase;
+use Swift_SmtpTransport;
 
 class MailerTests extends TestCase
 {
@@ -48,7 +49,9 @@ INVALID;
     
     public function testValidateEmail()
     {
-        $mailer = new Mailer();
+        $transport = new Swift_SmtpTransport();
+        $mailer = new Mailer($transport);
+        
         $reflector = new \ReflectionMethod(Mailer::class, 'validateEmail');
         $reflector->setAccessible(true);
     
