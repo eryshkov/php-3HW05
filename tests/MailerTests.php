@@ -8,7 +8,7 @@ use Swift_SmtpTransport;
 
 class MailerTests extends TestCase
 {
-    /** @link https://blogs.msdn.microsoft.com/testing123/2009/02/06/email-address-test-cases/  */
+    /** @link https://blogs.msdn.microsoft.com/testing123/2009/02/06/email-address-test-cases/ */
     protected $emailListValid = <<<'VALID'
 email@example.com
 firstname.lastname@example.com
@@ -45,7 +45,7 @@ email@111.222.333.44444
 email@example..com
 Abc..123@example.com
 INVALID;
-
+    
     
     public function testValidateEmail()
     {
@@ -54,13 +54,13 @@ INVALID;
         
         $reflector = new \ReflectionMethod(Mailer::class, 'validateEmail');
         $reflector->setAccessible(true);
-    
+        
         $validEmails = explode(PHP_EOL, $this->emailListValid);
         foreach ($validEmails as $validEmail) {
             $isValid = $reflector->invoke($mailer, $validEmail);
             $this->assertTrue($isValid, $validEmail . ' is not valid');
         }
-    
+        
         $invalidEmails = explode(PHP_EOL, $this->emailListInvalid);
         foreach ($invalidEmails as $invalidEmail) {
             $isValid = $reflector->invoke($mailer, $invalidEmail);

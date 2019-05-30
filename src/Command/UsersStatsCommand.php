@@ -32,8 +32,7 @@ class UsersStatsCommand extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Mails number of users')
-        ;
+            ->setDescription('Mails number of users');
     }
     
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -41,14 +40,14 @@ class UsersStatsCommand extends Command
         $io = new SymfonyStyle($input, $output);
         
         $usersCount = $this->userRepository->count([]);
-    
+        
         $message = (new \Swift_Message('Hello Email'))
             ->setFrom('dwebbo@bk.ru')
             ->setTo('eryshkov@gmail.com')
             ->setBody('You have ' . $usersCount . ' user(s)');
-            
+        
         $result = $this->mailer->send($message);
-    
+        
         if (0 !== $result) {
             $io->success('Email was sent successfully: ' . $result);
         } else {
