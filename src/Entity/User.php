@@ -157,16 +157,12 @@ class User
         }
         //-------End of search names at @template-------//
     
-        if (!empty($firstName) && !empty($lastName)) {
-            if (empty($middleName)) {
-                return implode(' ', $validPieces);
-            } else {
-                return implode(' ', $validPieces);
-            }
-        }
-    
         if (empty($firstName) || empty($lastName)) {
             return $this->email;
+        }
+        
+        if (!empty($firstName) && !empty($lastName)) {
+            return implode(' ', $validPieces);
         }
     }
 }
