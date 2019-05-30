@@ -16,11 +16,16 @@ class UsersStatsCommand extends Command
      * @var UserRepository
      */
     private $userRepository;
+    /**
+     * @var Mailer
+     */
+    private $mailer;
     
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, Mailer $mailer)
     {
         parent::__construct(null);
         $this->userRepository = $userRepository;
+        $this->mailer = $mailer;
     }
     
     protected function configure()
@@ -35,11 +40,18 @@ class UsersStatsCommand extends Command
         $io = new SymfonyStyle($input, $output);
     
         $usersCount = $this->userRepository->count([]);
-        
-        $mailer = new Mailer();
     
-        $mailer->mail('Users report', 'You have ' . $usersCount . ' user(s)');
-
-        $io->success('Email was sent successfully');
+        $message = (new \Swift_Message('Hello Email'))
+            ->setFrom('dwebbo@bk.ru')
+            ->setTo('eryshkov@gmail.com')
+            ->setBody('You have ' . $usersCount . ' user(s)');
+            
+        $result = $this->mailer->send($message);
+    
+        if (0 !== $result) {
+            $io->success('Email was sent successfully' . $result);
+        } else {
+            $io->error('Email was not sent');
+        }
     }
 }
