@@ -10,7 +10,7 @@ class Mailer extends Swift_Mailer
      * @param string $email
      * @return bool|null
      */
-    protected function validateEmail(string $email): ?bool
+    protected function validateEmail(string $email): bool
     {
         $regExp = '~^[^.]"?[A-Z0-9._%+-]+"?[^.]@\[?[A-Z0-9.-]+\.[A-Z0-9]{2,}\]?$~iD';
     
@@ -20,10 +20,6 @@ class Mailer extends Swift_Mailer
             return true;
         }
         
-        if (0 === $result) {
-            return false;
-        }
-        
-        return null;
+        return false;
     }
 }
